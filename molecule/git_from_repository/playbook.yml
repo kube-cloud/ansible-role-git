@@ -1,0 +1,12 @@
+---
+- name: Converge
+  hosts: all
+
+  roles:
+   - role: ansible-role-git
+     vars:
+      install_from_source: false
+      git_additionnal_repos: ""
+      packages:
+       - git
+       - git-svn

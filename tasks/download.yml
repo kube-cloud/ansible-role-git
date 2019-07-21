@@ -1,0 +1,9 @@
+---
+
+- name: ({{ ansible_distribution }}) Download Git Archive ( URL = {{ url }}, DEST = {{ git_downloaded_file }})
+  get_url:
+   url: "{{ url }}"
+   dest: "{{ git_downloaded_file }}"
+  when:
+   - from_source|bool
+   - git_process_install|bool
