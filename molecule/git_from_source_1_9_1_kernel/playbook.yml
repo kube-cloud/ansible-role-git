@@ -10,4 +10,4 @@
       v_patch: 1
       install_from_source: true
       from_github: false
-      install_doc: true
+      install_doc: false

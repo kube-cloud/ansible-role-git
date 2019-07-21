@@ -14,9 +14,6 @@ env:
         - ROLE_NAME: git
         - AUTHOR: jetune
     matrix:
-        - MOLECULE_DISTRO: centos6
-        - MOLECULE_DISTRO: centos7
-        - MOLECULE_DISTRO: ubuntu16
         - MOLECULE_DISTRO: ubuntu18
 
 before_install:
@@ -41,7 +38,7 @@ install:
 script:
 
     # Run Tests
-    - molecule test --all
+    - molecule test --scenario-name git_from_source_1_9_1_kernel
 
 # Norifications
 notifications:
