@@ -5,9 +5,9 @@
   roles:
    - role: ansible-role-git
      vars:
-      v_major: 2
-      v_minor: 10
-      v_patch: 0
+      v_major: 1
+      v_minor: 9
+      v_patch: 1
       install_from_source: true
       from_github: false
       install_doc: false
