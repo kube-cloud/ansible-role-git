@@ -63,19 +63,14 @@
 - name: ({{ ansible_distribution }}) Role initialisations for source installation option
   block:
 
-   - name: ({{ ansible_distribution }}) Check GIT required parameters (v_major, v_minor, v_patch)
+   - name: ({{ ansible_distribution }}) Check GIT versions compatibity with Ubuntu 18.04
      fail:
-      msg: "Vérifier les paramètres obligatoires : (v_major, v_minor, v_patch)"
-     when: >
-      v_major is not defined or
-      v_minor is not defined or
-      v_patch is not defined
-
-   - name: ({{ ansible_distribution }}) Check versions (Maj = {{ v_major }}, Min = {{ v_minor }}, Patch = {{ v_patch }})
-     fail:
-      msg: "Vérifier la version de GIT à installer depuis les sources : Min: [Major = 1, Minor = 9, Patch = 0]"
+      msg: "La version ({{ git_full_version }}) des sources est incompatible avec {{ ansible_distribution }} \
+      : {{ ansible_distribution_major_version }}"
      when:
-      - (v_major|int < 1) or (v_minor < 9) or (v_patch < 0)
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_major_version == 18
+      - git_full_version  is version_compare('2.10.0', operator='<')
 
    - name: ({{ ansible_distribution }}) Define commons facts
      set_fact:
@@ -119,18 +114,36 @@
 
    - name: ({{ ansible_distribution }}) Define Required package for RedHat based
      set_fact:
-      git_required_packages: "{{ required_packages | default(['make', 'dh-autoreconf', 'curl-devel', 'expat-devel', \
-      'gettext-devel', 'openssl-devel', 'perl-devel', 'zlib-devel', 'asciidoc', 'xmlto', 'docbook2X', 'gnu-getopt']) }}"
+      git_required_packages: "{{ required_packages | default(['make', 'curl-devel', 'expat-devel', \
+      'gettext-devel', 'openssl-devel', 'zlib-devel', 'asciidoc', 'xmlto', 'docbook2X', 'gnu-getopt']) }}"
      when:
       - ansible_os_family == "RedHat"
+      - git_install_doc|bool
+
+   - name: ({{ ansible_distribution }}) Define Required package for RedHat based
+     set_fact:
+      git_required_packages: "{{ required_packages | default(['make', 'curl-devel', 'expat-devel', \
+      'gettext-devel', 'openssl-devel', 'zlib-devel']) }}"
+     when:
+      - ansible_os_family == "RedHat"
+      - not git_install_doc|bool
 
    - name: ({{ ansible_distribution }}) Define Required package for Debian based
      set_fact:
-      git_required_packages: "{{ required_packages | default(['make', 'dh-autoreconf', 'libcurl4-gnutls-dev', \
+      git_required_packages: "{{ required_packages | default(['make', 'libcurl4-gnutls-dev', \
       'libexpat1-dev', 'gettext', 'libz-dev', 'libssl-dev', 'asciidoc', 'xmlto', 'docbook2x', \
       'install-info']) }}"
      when:
       - ansible_os_family == "Debian"
+      - git_install_doc|bool
+
+   - name: ({{ ansible_distribution }}) Define Required package for Debian based
+     set_fact:
+      git_required_packages: "{{ required_packages | default(['make', 'libcurl4-gnutls-dev', \
+      'libexpat1-dev', 'gettext', 'libz-dev', 'libssl-dev']) }}"
+     when:
+      - ansible_os_family == "Debian"
+      - not git_install_doc|bool
 
    - name: ({{ ansible_distribution }}) Create GIT temporary directory
      file:

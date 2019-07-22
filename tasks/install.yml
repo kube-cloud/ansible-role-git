@@ -53,16 +53,33 @@
      changed_when: false
      failed_when: false
      check_mode: false
+     register: git_build
 
    - name: Execute ls
      command: >
-      ls -R /usr/bin
+      ls -al /usr
+     changed_when: false
+     failed_when: false
+     check_mode: false
+     register: usr
+
+   - name: Execute ls
+     command: >
+      ls -al /usr/bin
      changed_when: false
      failed_when: false
      check_mode: false
      register: usr_bin
 
-   - name: Pring LS
+   - name: Pring Build Result
+     debug:
+      var: git_build
+
+   - name: Pring LS usr
+     debug:
+      var: usr
+
+   - name: Pring LS usr_bin
      debug:
       var: usr_bin
 
