@@ -60,35 +60,6 @@
      changed_when: false
      failed_when: false
      check_mode: false
-     register: git_build
-
-   - name: Execute ls
-     command: >
-      ls -al /usr
-     changed_when: false
-     failed_when: false
-     check_mode: false
-     register: usr
-
-   - name: Execute ls
-     command: >
-      ls -al /usr/bin
-     changed_when: false
-     failed_when: false
-     check_mode: false
-     register: usr_bin
-
-   - name: Pring Build Result
-     debug:
-      var: git_build
-
-   - name: Pring LS usr
-     debug:
-      var: usr
-
-   - name: Pring LS usr_bin
-     debug:
-      var: usr_bin
 
   when:
    - from_source|bool
@@ -113,25 +84,13 @@
      when:
       - ansible_os_family == "Debian"
 
-   - name: ({{ Debian }}) Install GIT with addirional packages ({{ git_packages }})
+   - name: ({{ Debian }}) Install GIT with additional packages ({{ git_packages }})
      apt:
       name: "{{ git_packages }}"
       state: present
      when:
       - ansible_os_family == "Debian"
      register: git_install_centos
-
-   - name: ({{ os_with_version }}) Check Just installed GIT version.
-     command: >
-       which git
-     changed_when: false
-     failed_when: false
-     check_mode: false
-     register: just_installed_git_version
-
-   - name: ({{ os_with_version }}) Print install from repository result
-     debug:
-      var: just_installed_git_version
 
   when:
    - not from_source|bool
