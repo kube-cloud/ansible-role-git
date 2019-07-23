@@ -15,21 +15,22 @@
 - name: ({{ ansible_distribution }}) Define installation origin fact
   set_fact:
    from_source: "{{ install_from_source | default(true) }}"
+   os_with_version: "{{ ansible_distribution }} {{ ansible_distribution_major_version }}"
 
-- name: ({{ ansible_distribution }}) Define GIT Already Installed fact
+- name: ({{ os_with_version }}) Define GIT Already Installed fact
   set_fact:
    git_already_installed: "{{ git_installed_version.rc == 0 }}"
 
-- name: ({{ ansible_distribution }}) Extract current installed Git version
+- name: ({{ os_with_version }}) Extract current installed Git version
   set_fact:
    git_installed_version: "{{ git_installed_version.stdout_lines[0].split(' ')[2] }}"
   when:
    - git_already_installed|bool
 
-- name: ({{ ansible_distribution }}) Build source installation root facts
+- name: ({{ os_with_version }}) Build source installation root facts
   block:
 
-   - name: ({{ ansible_distribution }}) Check GIT required parameters (v_major, v_minor, v_patch)
+   - name: ({{ os_with_version }}) Check GIT required parameters (v_major, v_minor, v_patch)
      fail:
       msg: "Vérifier les paramètres obligatoires : (v_major, v_minor, v_patch)"
      when: >
@@ -37,19 +38,19 @@
       v_minor is not defined or
       v_patch is not defined
 
-   - name: ({{ ansible_distribution }}) Define commons facts
+   - name: ({{ os_with_version }}) Define commons facts
      set_fact:
       git_full_version: "{{ v_major }}.{{ v_minor }}.{{ v_patch }}"
       git_force_install: "{{ force_install | default(true) }}"
 
-   - name: ({{ ansible_distribution }}) efDine whether or not upgrade
+   - name: ({{ os_with_version }}) efDine whether or not upgrade
      set_fact:
       git_upgrade: "{{ git_already_installed|bool and git_force_install|bool and \
       git_installed_version is version_compare(git_full_version, operator='<') }}"
       git_downgrade: "{{ git_already_installed|bool and git_force_install|bool and \
       git_installed_version is version_compare(git_full_version, operator='>') }}"
 
-   - name: ({{ ansible_distribution }}) efDine whether or not upgrade
+   - name: ({{ os_with_version }}) efDine whether or not upgrade
      set_fact:
       git_process_install: "{{ not git_already_installed|bool or git_upgrade|bool or git_downgrade|bool }}"
 
@@ -60,10 +61,10 @@
 
   when: from_source|bool
 
-- name: ({{ ansible_distribution }}) Role initialisations for source installation option
+- name: ({{ os_with_version }}) Role initialisations for source installation option
   block:
 
-   - name: ({{ ansible_distribution }}) Check GIT versions compatibity with Ubuntu 18.04
+   - name: ({{ os_with_version }}) Check GIT versions compatibity with Ubuntu 18.04
      fail:
       msg: "La version ({{ git_full_version }}) des sources est incompatible avec {{ ansible_distribution }} \
       : {{ ansible_distribution_major_version }}"
@@ -72,7 +73,7 @@
       - ansible_distribution_major_version == 18
       - git_full_version  is version_compare('2.10.0', operator='<')
 
-   - name: ({{ ansible_distribution }}) Define commons facts
+   - name: ({{ os_with_version }}) Define commons facts
      set_fact:
       git_tmp_dir: "/tmp/git_from_source"
       git_tmp_expand_dir: "/tmp/git_from_source/git-{{ v_major }}.{{ v_minor }}.{{ v_patch }}"
@@ -80,7 +81,7 @@
       git_downloaded_file: "/tmp/git_from_source/git-{{ v_major }}.{{ v_minor }}.{{ v_patch }}.tar.gz"
       git_install_doc: "{{ install_doc | default(false) }}"
 
-   - name: ({{ ansible_distribution }}) Define Git packages to build and install [Install Doc = {{ git_install_doc }}]
+   - name: ({{ os_with_version }}) Define Git packages to build and install [Install Doc = {{ git_install_doc }}]
      set_fact:
       git_build_packages:
        - all
@@ -91,7 +92,7 @@
      when:
       - git_install_doc|bool
 
-   - name: ({{ ansible_distribution }}) Define Git packages to build and install [Install Doc = {{ git_install_doc }}]
+   - name: ({{ os_with_version }}) Define Git packages to build and install [Install Doc = {{ git_install_doc }}]
      set_fact:
       git_build_packages:
        - all
@@ -99,20 +100,20 @@
      when:
       - not git_install_doc|bool
 
-   - name: ({{ ansible_distribution }}) Define URL facts when Github source
+   - name: ({{ os_with_version }}) Define URL facts when Github source
      set_fact:
       url: "https://codeload.github.com/git/git/tar.gz/v{{ v_major }}.{{ v_minor }}.{{ v_patch }}"
      when:
       - (from_github is not defined) or (from_github is defined and from_github|bool)
 
-   - name: ({{ ansible_distribution }}) Define URL facts when Kernel source
+   - name: ({{ os_with_version }}) Define URL facts when Kernel source
      set_fact:
       url: "https://mirrors.edge.kernel.org/pub/software/scm/git/git-{{ v_major }}.{{ v_minor }}.{{ v_patch }}.tar.gz"
      when:
       - from_github is defined
       - not from_github|bool
 
-   - name: ({{ ansible_distribution }}) Define Required package for RedHat based
+   - name: ({{ os_with_version }}) Define Required package for RedHat based
      set_fact:
       git_required_packages: "{{ required_packages | default(['make', 'curl-devel', 'expat-devel', \
       'gettext-devel', 'openssl-devel', 'zlib-devel', 'asciidoc', 'xmlto', 'docbook2X', 'gnu-getopt']) }}"
@@ -120,7 +121,7 @@
       - ansible_os_family == "RedHat"
       - git_install_doc|bool
 
-   - name: ({{ ansible_distribution }}) Define Required package for RedHat based
+   - name: ({{ os_with_version }}) Define Required package for RedHat based
      set_fact:
       git_required_packages: "{{ required_packages | default(['make', 'curl-devel', 'expat-devel', \
       'gettext-devel', 'openssl-devel', 'zlib-devel']) }}"
@@ -128,7 +129,7 @@
       - ansible_os_family == "RedHat"
       - not git_install_doc|bool
 
-   - name: ({{ ansible_distribution }}) Define Required package for Debian based
+   - name: ({{ os_with_version }}) Define Required package for Debian based
      set_fact:
       git_required_packages: "{{ required_packages | default(['make', 'libcurl4-gnutls-dev', \
       'libexpat1-dev', 'gettext', 'libz-dev', 'libssl-dev', 'asciidoc', 'xmlto', 'docbook2x', \
@@ -137,7 +138,7 @@
       - ansible_os_family == "Debian"
       - git_install_doc|bool
 
-   - name: ({{ ansible_distribution }}) Define Required package for Debian based
+   - name: ({{ os_with_version }}) Define Required package for Debian based
      set_fact:
       git_required_packages: "{{ required_packages | default(['make', 'libcurl4-gnutls-dev', \
       'libexpat1-dev', 'gettext', 'libz-dev', 'libssl-dev']) }}"
@@ -145,7 +146,7 @@
       - ansible_os_family == "Debian"
       - not git_install_doc|bool
 
-   - name: ({{ ansible_distribution }}) Create GIT temporary directory
+   - name: ({{ os_with_version }}) Create GIT temporary directory
      file:
       path: "{{ git_tmp_dir }}"
       state: directory
@@ -154,12 +155,12 @@
    - from_source|bool
    - git_process_install|bool
 
-- name: ({{ ansible_distribution }}) Role initialisations for package installation option
+- name: ({{ os_with_version }}) Role initialisations for package installation option
   block:
 
-   - name: ({{ ansible_distribution }}) Define package to install
+   - name: ({{ os_with_version }}) Define package to install
      set_fact:
-      git_packages: "{{ ['git-all'] + packages }}"
+      git_packages: "{{ ['git'] + packages }}"
       git_additionnal_repos: "{{ additionnal_repos | default(omit, true) }}"
 
   when: not from_source|bool

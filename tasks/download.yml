@@ -1,6 +1,6 @@
 ---
 
-- name: ({{ ansible_distribution }}) Download Git Archive ( URL = {{ url }}, DEST = {{ git_downloaded_file }})
+- name: ({{ os_with_version }}) Download Git Archive ( URL = {{ url }}, DEST = {{ git_downloaded_file }})
   get_url:
    url: "{{ url }}"
    dest: "{{ git_downloaded_file }}"

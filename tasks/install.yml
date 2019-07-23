@@ -1,22 +1,29 @@
 ---
 
-- name: ({{ ansible_distribution }}) Install GIT From Source Tasks Block
+- name: ({{ os_with_version }}) Install 'which' command if not installed on RedHat based OS
+  package:
+   name: which
+   state: present
+  when:
+   - ansible_os_family == "RedHat"
+
+- name: ({{ os_with_version }}) Install GIT From Source Tasks Block
   block:
 
-   - name: ({{ ansible_distribution }}) Enable EPEL Releases
+   - name: ({{ os_with_version }}) Enable EPEL Releases
      yum:
       name: epel-release
       state: present
      when:
       - ansible_os_family == "RedHat"
 
-   - name: ({{ ansible_distribution }}) Ensure require dependencies are installed ({{ git_required_packages }})
+   - name: ({{ os_with_version }}) Ensure require dependencies are installed ({{ git_required_packages }})
      package:
       name: "{{ item }}"
       state: present
      with_items: "{{ git_required_packages }}"
 
-   - name: ({{ ansible_distribution }}) Create simlink for docbook2x-texi on RedHat based OS
+   - name: ({{ os_with_version }}) Create simlink for docbook2x-texi on RedHat based OS
      file:
       src: "/usr/bin/db2x_docbook2texi"
       dest: "/usr/bin/docbook2x-texi"
@@ -24,12 +31,12 @@
      when:
       - ansible_os_family == "RedHat"
 
-   - name: ({{ ansible_distribution }}) Create GIT Expand directory ({{ git_tmp_expand_dir }})
+   - name: ({{ os_with_version }}) Create GIT Expand directory ({{ git_tmp_expand_dir }})
      file:
       path: "{{ git_tmp_expand_dir }}"
       state: directory
 
-   - name: ({{ ansible_distribution }}) Uncompress Git archives to {{ git_tmp_expand_dir }}
+   - name: ({{ os_with_version }}) Uncompress Git archives to {{ git_tmp_expand_dir }}
      unarchive:
       src: "{{ git_downloaded_file }}"
       dest: "{{ git_tmp_expand_dir }}"
@@ -38,12 +45,12 @@
       extra_opts:
        - --strip-components=1
 
-   - name: ({{ ansible_distribution }}) Ensure that installed dir exists ({{ git_install_dir }})
+   - name: ({{ os_with_version }}) Ensure that installed dir exists ({{ git_install_dir }})
      file:
       path: "{{ git_install_dir }}"
       state: directory
 
-   - name: ({{ ansible_distribution }}) Build Git to installed ({{ git_install_dir }}) - ({{ git_build_packages }})
+   - name: ({{ os_with_version }}) Build Git to installed ({{ git_install_dir }}) - ({{ git_build_packages }})
      make:
       target: "{{ item }}"
       chdir: "{{ git_tmp_expand_dir }}"
@@ -87,30 +94,44 @@
    - from_source|bool
    - git_process_install|bool
 
-- name: ({{ ansible_distribution }}) Install GIT From Repository Tasks Block
+- name: ({{ os_with_version }}) Install GIT From Repository Tasks Block
   block:
 
-   - name: ({{ ansible_distribution }}) Install GIT with additional packages ({{ git_packages }})
-     package:
+   - name: ({{ RedHat }}) Install GIT with additional packages ({{ git_packages }})
+     yum:
       name: "{{ git_packages }}"
       state: present
       enablerepo: "{{ git_additionnal_repos }}"
      when:
       - ansible_os_family == "RedHat"
+     register: git_install_redhat
 
-   - name: ({{ ansible_distribution }}) Update APT Cache
+   - name: ({{ os_with_version }}) Update APT Cache
      apt:
       update_cache: true
       cache_valid_time: 86400
      when:
       - ansible_os_family == "Debian"
 
-   - name: ({{ ansible_distribution }}) Install GIT with addirional packages ({{ git_packages }})
+   - name: ({{ Debian }}) Install GIT with addirional packages ({{ git_packages }})
      apt:
       name: "{{ git_packages }}"
       state: present
      when:
       - ansible_os_family == "Debian"
+     register: git_install_centos
+
+   - name: ({{ os_with_version }}) Check Just installed GIT version.
+     command: >
+       which git
+     changed_when: false
+     failed_when: false
+     check_mode: false
+     register: just_installed_git_version
+
+   - name: ({{ os_with_version }}) Print install from repository result
+     debug:
+      var: just_installed_git_version
 
   when:
    - not from_source|bool
