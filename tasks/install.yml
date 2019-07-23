@@ -30,6 +30,7 @@
       state: link
      when:
       - ansible_os_family == "RedHat"
+      - git_install_doc|bool
 
    - name: ({{ os_with_version }}) Create GIT Expand directory ({{ git_tmp_expand_dir }})
      file:
