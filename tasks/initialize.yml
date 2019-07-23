@@ -80,11 +80,12 @@
       git_install_dir: "{{ install_dir | default('/usr') }}"
       git_downloaded_file: "/tmp/git_from_source/git-{{ v_major }}.{{ v_minor }}.{{ v_patch }}.tar.gz"
       git_install_doc: "{{ install_doc | default(false) }}"
+      git_build_prefixed_packages:
+       - all
 
    - name: ({{ os_with_version }}) Define Git packages to build and install [Install Doc = {{ git_install_doc }}]
      set_fact:
       git_build_packages:
-       - all
        - install
        - install-doc
        - install-html
@@ -95,7 +96,6 @@
    - name: ({{ os_with_version }}) Define Git packages to build and install [Install Doc = {{ git_install_doc }}]
      set_fact:
       git_build_packages:
-       - all
        - install
      when:
       - not git_install_doc|bool

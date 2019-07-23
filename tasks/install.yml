@@ -51,12 +51,21 @@
       path: "{{ git_install_dir }}"
       state: directory
 
-   - name: ({{ os_with_version }}) Build Git to installed ({{ git_install_dir }}) - ({{ git_build_packages }})
+   - name: ({{ os_with_version }}) Build prefixed Git to ({{ git_install_dir }}) - ({{ git_build_prefixed_packages }})
      make:
       target: "{{ item }}"
       chdir: "{{ git_tmp_expand_dir }}"
       params:
        prefix: "{{ git_install_dir }}"
+     with_items: "{{ git_build_prefixed_packages }}"
+     changed_when: false
+     failed_when: false
+     check_mode: false
+
+   - name: ({{ os_with_version }}) Build Git to others packages - ({{ git_build_packages }})
+     make:
+      target: "{{ item }}"
+      chdir: "{{ git_tmp_expand_dir }}"
      with_items: "{{ git_build_packages }}"
      changed_when: false
      failed_when: false
