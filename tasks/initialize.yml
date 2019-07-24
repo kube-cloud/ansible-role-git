@@ -115,7 +115,7 @@
 
    - name: ({{ os_with_version }}) Define Required package for RedHat based
      set_fact:
-      git_required_packages: "{{ required_packages | default(['make', 'curl-devel', 'expat-devel', \
+      git_required_packages: "{{ required_packages | default(['make', 'gcc', 'curl-devel', 'expat-devel', \
       'gettext-devel', 'openssl-devel', 'zlib-devel', 'asciidoc', 'xmlto', 'docbook2X', 'gnu-getopt']) }}"
      when:
       - ansible_os_family == "RedHat"
@@ -123,7 +123,7 @@
 
    - name: ({{ os_with_version }}) Define Required package for RedHat based
      set_fact:
-      git_required_packages: "{{ required_packages | default(['make', 'curl-devel', 'expat-devel', \
+      git_required_packages: "{{ required_packages | default(['make', 'gcc', 'curl-devel', 'expat-devel', \
       'gettext-devel', 'openssl-devel', 'zlib-devel']) }}"
      when:
       - ansible_os_family == "RedHat"
@@ -131,7 +131,7 @@
 
    - name: ({{ os_with_version }}) Define Required package for Debian based
      set_fact:
-      git_required_packages: "{{ required_packages | default(['make', 'libcurl4-gnutls-dev', \
+      git_required_packages: "{{ required_packages | default(['make', 'gcc', 'libcurl4-gnutls-dev', \
       'libexpat1-dev', 'gettext', 'libz-dev', 'libssl-dev', 'asciidoc', 'xmlto', 'docbook2x', \
       'install-info']) }}"
      when:
@@ -140,7 +140,7 @@
 
    - name: ({{ os_with_version }}) Define Required package for Debian based
      set_fact:
-      git_required_packages: "{{ required_packages | default(['make', 'libcurl4-gnutls-dev', \
+      git_required_packages: "{{ required_packages | default(['make', 'gcc', 'libcurl4-gnutls-dev', \
       'libexpat1-dev', 'gettext', 'libz-dev', 'libssl-dev']) }}"
      when:
       - ansible_os_family == "Debian"
