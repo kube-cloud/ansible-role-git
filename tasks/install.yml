@@ -72,10 +72,6 @@
      check_mode: false
      register: make_all
 
-   - name: Display Make All result
-     debug:
-      var: make_all
-
    - name: ({{ os_with_version }}) Build Git to others packages - ({{ git_build_packages }})
      make:
       target: "{{ item }}"
@@ -87,10 +83,6 @@
      failed_when: false
      check_mode: false
      register: make_install
-
-   - name: Display Make Install result
-     debug:
-      var: make_install
 
    - name: Check current GIT version.
      command: >
