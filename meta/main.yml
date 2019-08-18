@@ -19,8 +19,8 @@ galaxy_info:
               - bionic
     galaxy_tags:
         - development
-        - version control system
-        - source control
+        - versionning
+        - vcs
         - system
         - linux
         - git
