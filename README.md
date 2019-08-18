@@ -1,4 +1,4 @@
-# Ansible Linux based Java role
+# Ansible Linux based Git role
 
 ![Python](https://img.shields.io/pypi/pyversions/testinfra.svg?style=flat)
 ![Licence](https://img.shields.io/github/license/kube-cloud/ansible-role-git.svg?style=flat)
@@ -20,7 +20,7 @@ Installation ca be done from repository or from source
 
 * CentOS 6/7
 * RedHat 6/7
-* Ubuntu Trusty/Xenial/Bionic
+* Ubuntu Xenial/Bionic
 * Debian Jessie/Strech
 
 # Role variables
